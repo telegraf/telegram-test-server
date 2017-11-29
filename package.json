@@ -1,0 +1,39 @@
+{
+  "name": "telegram-test-server",
+  "version": "0.0.0",
+  "description": "",
+  "license": "MIT",
+  "author": "Vitaly Domnikov <dotcypress@gmail.com>",
+  "homepage": "https://github.com/telegraf/telegram-test-server#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/telegraf/telegram-test-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/telegraf/telegram-test-server/issues"
+  },
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "ava test",
+    "precommit": "npm run lint && npm test"
+  },
+  "engines": {
+    "node": ">=8.6.0"
+  },
+  "dependencies": {
+    "debug": "^3.0.0",
+    "node-fetch": "^1.6.3"
+  },
+  "devDependencies": {
+    "ava": "^0.23.0",
+    "eslint": "^4.1.1",
+    "eslint-config-standard": "^10.2.0",
+    "eslint-plugin-ava": "^4.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-node": "^5.1.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "husky": "^0.14.1"
+  }
+}
