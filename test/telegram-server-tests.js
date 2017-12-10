@@ -1,46 +1,58 @@
 const test = require('ava')
 const { Telegram } = require('telegraf')
+const getPort = require('get-port')
 const TelegramServer = require('../')
 
-const BotConfig = {
-  apiRoot: 'http://0.0.0.0:4000',
-  agent: null
-}
-
-let server
-let userHandle
-let botHandle
-let chatHandle
-
-test.before(async (t) => {
-  server = new TelegramServer({ port: 4000 })
-  botHandle = server.createBot()
-  userHandle = server.createUser()
-  chatHandle = userHandle.startBot(botHandle)
-  server.start()
-})
-
-test.after.always((t) => server.stop())
-
 test('get me with invalid token', async (t) => {
-  const client = new Telegram('fake-token', BotConfig)
+  const port = await getPort()
+  const server = new TelegramServer({ port })
+  server.start()
+  const client = new Telegram('fake-token', {
+    apiRoot: server.getApiEndpoint()
+  })
   await t.throws(client.getMe())
+  server.stop()
 })
 
 test('get me', async (t) => {
-  const client = new Telegram(botHandle.token, BotConfig)
+  const port = await getPort()
+  const server = new TelegramServer({ port })
+  const bot = server.createBot()
+  server.start()
+  const client = new Telegram(bot.token, {
+    apiRoot: server.getApiEndpoint()
+  })
   const { username } = await client.getMe()
-  t.is(botHandle.info.username, username)
+  t.is(bot.info.username, username)
+
+  server.stop()
 })
 
 test('get chat', async (t) => {
-  const client = new Telegram(botHandle.token, BotConfig)
-  const { type } = await client.getChat(chatHandle.info.id)
+  const port = await getPort()
+  const server = new TelegramServer({ port })
+  const bot = server.createBot()
+  const user = server.createUser()
+  const chat = user.startBot(bot)
+  server.start()
+  const client = new Telegram(bot.token, {
+    apiRoot: server.getApiEndpoint()
+  })
+  const { type } = await client.getChat(chat.info.id)
   t.is(type, 'private')
+  server.stop()
 })
 
 test('get updates', async (t) => {
-  const client = new Telegram(botHandle.token, BotConfig)
+  const port = await getPort()
+  const server = new TelegramServer({ port })
+  const bot = server.createBot()
+  const user = server.createUser()
+  user.startBot(bot)
+  server.start()
+  const client = new Telegram(bot.token, {
+    apiRoot: server.getApiEndpoint()
+  })
   const updates = await client.getUpdates()
   t.is(updates.length, 1)
 })
