@@ -1,26 +1,26 @@
 const test = require('ava')
 const Telegraf = require('telegraf')
-const getPort = require('get-port')
 const TelegramServer = require('../')
-const { wait } = require('../lib/utils')
 
-test('simple bot', async (t) => {
-  const port = await getPort()
-  const server = new TelegramServer({ port })
-  server.start()
+const wait = (ms = 100) => new Promise((resolve, reject) => setTimeout(resolve, ms))
 
-  const user = server.createUser()
-  const bot = server.createBot()
-  const chat = user.startBot(bot)
-
-  const apiRoot = server.getApiEndpoint()
-  const exampleBot = new Telegraf(bot.token, { telegram: { apiRoot } })
+function startBot (token, apiRoot) {
+  const exampleBot = new Telegraf(token, { telegram: { apiRoot } })
   exampleBot.start(({ reply }) => reply('Ola'))
   exampleBot.action('cat', async ({ answerCbQuery, reply }) => {
     await answerCbQuery('🐈')
     await reply('Meow')
   })
   exampleBot.startPolling()
+}
+
+test('example bot', async (t) => {
+  const server = new TelegramServer()
+  server.start()
+
+  const { user, bot, chat } = server.createSandbox()
+
+  startBot(bot.token, server.getApiEndpoint())
 
   await wait()
   t.is(chat.history.length, 2)
